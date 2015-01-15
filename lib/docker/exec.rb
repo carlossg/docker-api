@@ -62,7 +62,12 @@ class Docker::Exec
     end
 
     connection.post(path_for(:start), nil, excon_params)
-    [msgs.stdout_messages, msgs.stderr_messages]
+
+    # get details for execution, such as exit code
+    resp = connection.get(path_for(:json), nil, nil)
+    hash = Docker::Util.parse_json(resp) || {}
+
+    [msgs.stdout_messages, msgs.stderr_messages, msgs.all_messages, hash]
   end
 
   # #start! performs the associated action and returns the output.
